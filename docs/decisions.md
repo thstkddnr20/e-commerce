@@ -8,4 +8,9 @@
   - 반면에 Address Entity는 새로 추가되거나, 바뀌기 쉬운 데이터들이 존재하므로 이를 별도의 엔티티로 분리하여 관리한다.
 
 - MemberService에서 바로 Entity를 사용하는 패턴 (7/15)
-  - 유저의 도메인 규칙이 현재로서는 복잡하지 않다고 판단하여 도메인 계층을 추가하여 관리하는 것이 아닌 Entity를 그대로 Service에서 사용한다. 
+  - 유저의 도메인 규칙이 현재로서는 복잡하지 않다고 판단하여 도메인 계층을 추가하여 관리하는 것이 아닌 Entity를 그대로 Service에서 사용한다.
+
+- 도메인간의 협력이 필요한 부분에서 UseCase를 사용 (7/17)
+  - 하나의 도메인만을 사용하는 부분에서는 Controller가 Service를 직접 참조한다.
+  - 여러 도메인을 사용하는 부분에서는 Service의 상위 계층인 UseCase를 만들고 Service를 orchestrate 한다.
+  - UseCase에는 흐름을 직관적으로 유추할 수 있는 이름을 지어준다. ex) PlaceOrderUseCase 
