@@ -1,20 +1,23 @@
 package github.sangwook.ecommerce.catalog
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 //============================================= Entity
 
-class CatalogEntity(
+class ProductEntity(
     val id: Long,
     var name: String,
     var description: String,
-    var price: Int,
     var category: Long,
     var status: SaleStatus
+)
+
+class SkuEntity(
+    val id: Long,
+    val catalogId: Long,
+    var optionName: String,
+    var price: Int
 )
 
 class CategoryEntity(
@@ -23,9 +26,9 @@ class CategoryEntity(
 )
 
 class CategoryClosure(
-    var ancestor: Long,
-    var descendant: Long,
-    var depth: Int
+    val ancestor: Long,
+    val descendant: Long,
+    val depth: Int
 )
 
 
@@ -57,7 +60,6 @@ class Product(
     val id: Long,
     var name: String,
     var description: String,
-    var price: Money,
     val categoryId: Long,
     var status: SaleStatus
 ) {
@@ -65,25 +67,14 @@ class Product(
     fun stopSelling() { status = SaleStatus.STOPPED }
 }
 
+class Sku( //Stock Keeping Unit - 최소 분류 단위 (동일한 상품이라도 색상, 사이즈, 규격, 포장단위가 다르면 각각 별개의 SKU로 간주), 재고 단위의 관리를 위함
+    val id: Long,
+    val productId: Long,
+    val optionName: String,
+    var price: Money
+)
+
 //============================================= Domain End
-
-fun CatalogEntity.toDomain() = Product(
-    id = id,
-    name = name,
-    description = description,
-    price = Money(price),
-    categoryId = category,
-    status = status
-)
-
-fun Product.toEntity() = CatalogEntity(
-    id = id,
-    name = name,
-    description = description,
-    price = price.amount,
-    category = categoryId,
-    status = status
-)
 
 //fun assembleTree(
 //    rootId: Long,
@@ -106,123 +97,103 @@ fun Product.toEntity() = CatalogEntity(
 //    return build(rootId)
 //}
 
-class CatalogTest {
+class CatalogDomainTest {
+
+    // ===== Product =====
 
     @Test
-    fun `엔티티를 도메인으로 변환하면 price가 Money로 감싸진다`() {
-        val entity = CatalogEntity(
-            id = 1L,
-            name = "흰 반팔티",
-            description = "면 100%",
-            price = 19000,
-            category = 3L,
-            status = SaleStatus.SELLING
-        )
-
-        val product = entity.toDomain()
-
-        assertEquals(Money(19000), product.price)
-        assertEquals(3L, product.categoryId)
-    }
-
-    @Test
-    fun `도메인을 엔티티로 변환하면 Money가 Int로 풀린다`() {
-        val product = Product(
-            id = 1L,
-            name = "흰 반팔티",
-            description = "면 100%",
-            price = Money(19000),
-            categoryId = 3L,
-            status = SaleStatus.SELLING
-        )
-
-        val entity = product.toEntity()
-
-        assertEquals(19000, entity.price)
-    }
-
-    @Test
-    fun `Money는 값이 같으면 같다`() {
-        assertEquals(Money(1000), Money(1000))
-        assertTrue(Money(1000) == Money(1000))
-    }
-
-    @Test
-    fun `Money 연산`() {
-        assertEquals(Money(3000), Money(1000) + Money(2000))
-        assertEquals(Money(6000), Money(2000) * 3)
-        assertEquals(Money(500), Money(1000) - Money(500))
-        assertEquals(Money(0), Money(1000) - Money(1000))   // 0원 허용
-    }
-
-    @Test
-    fun `음수 금액은 만들 수 없다`() {
-        assertThrows<IllegalArgumentException> { Money(-1) }
-        assertThrows<IllegalArgumentException> { Money(500) - Money(1000) }
-    }
-
-    @Test
-    fun `판매중지된 상품은 판매 불가`() {
-        val product = Product(1L, "티셔츠", "설명", Money(19000), 3L, SaleStatus.SELLING)
+    fun `판매중인 상품은 판매 가능하다`() {
+        val product = Product(1L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
 
         assertTrue(product.isSellable())
+    }
+
+    @Test
+    fun `판매중지하면 판매 불가능해진다`() {
+        val product = Product(1L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
 
         product.stopSelling()
 
         assertFalse(product.isSellable())
+        assertEquals(SaleStatus.STOPPED, product.status)
     }
 
-//    @Test
-//    fun `클로저 테이블로 카테고리 트리를 조립한다`() {
-//        val categories = listOf(
-//            CategoryEntity(1L, "의류"),
-//            CategoryEntity(2L, "상의"),
-//            CategoryEntity(3L, "티셔츠"),
-//            CategoryEntity(4L, "셔츠"),
-//            CategoryEntity(5L, "하의"),
-//            CategoryEntity(6L, "청바지")
-//        )
-//        val closures = listOf(
-//            CategoryClosure(1L, 1L, 0), CategoryClosure(1L, 2L, 1),
-//            CategoryClosure(1L, 3L, 2), CategoryClosure(1L, 4L, 2),
-//            CategoryClosure(1L, 5L, 1), CategoryClosure(1L, 6L, 2),
-//            CategoryClosure(2L, 2L, 0), CategoryClosure(2L, 3L, 1),
-//            CategoryClosure(2L, 4L, 1),
-//            CategoryClosure(3L, 3L, 0), CategoryClosure(4L, 4L, 0),
-//            CategoryClosure(5L, 5L, 0), CategoryClosure(5L, 6L, 1),
-//            CategoryClosure(6L, 6L, 0)
-//        )
-//
-//        val tree = assembleTree(1L, categories, closures)
-//
-//        assertEquals("의류", tree.name)
-//        assertEquals(2, tree.children.size)                    // 상의, 하의
-//        assertEquals("상의", tree.children[0].name)
-//        assertEquals(2, tree.children[0].children.size)        // 티셔츠, 셔츠
-//        assertEquals("티셔츠", tree.children[0].children[0].name)
-//        assertEquals(0, tree.children[0].children[0].children.size)  // 잎사귀
-//    }
+    @Test
+    fun `상품은 재고를 모른다`() {
+        val product = Product(1L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
+
+        // product.quantity  ← 컴파일 안 됨. 재고는 Inventory 도메인 소유
+        // 상품이 아는 건 "무엇을 파는가"뿐
+        assertEquals(3L, product.categoryId)
+    }
+
+    // ===== Sku =====
 
     @Test
-    fun `상의 아래 상품을 모두 조회한다 - IN절 흉내`() {
-        val closures = listOf(
-            CategoryClosure(2L, 2L, 0),
-            CategoryClosure(2L, 3L, 1),
-            CategoryClosure(2L, 4L, 1)
-        )
-        val products = listOf(
-            CatalogEntity(1L, "흰 반팔티", "", 19000, 3L, SaleStatus.SELLING),
-            CatalogEntity(2L, "검정 셔츠", "", 39000, 4L, SaleStatus.SELLING),
-            CatalogEntity(3L, "청바지", "", 59000, 6L, SaleStatus.SELLING)   // 하의 소속
+    fun `하나의 상품은 여러 SKU를 가진다`() {
+        val product = Product(100L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
+
+        val skus = listOf(
+            Sku(1L, product.id, "검정 / M", Money(19000)),
+            Sku(2L, product.id, "검정 / L", Money(19000)),
+            Sku(3L, product.id, "흰색 / M", Money(21000))
         )
 
-        // WHERE ancestor = 2 → descendant 목록
-        val descendantIds = closures.filter { it.ancestor == 2L }.map { it.descendant }
+        assertEquals(3, skus.size)
+        assertTrue(skus.all { it.productId == product.id })
+    }
 
-        // WHERE category_id IN (...)
-        val found = products.filter { it.category in descendantIds }.map { it.toDomain() }
+    @Test
+    fun `SKU마다 가격이 다를 수 있다`() {
+        val skus = listOf(
+            Sku(1L, 100L, "검정 / M", Money(19000)),
+            Sku(2L, 100L, "흰색 / XL", Money(21000))
+        )
 
-        assertEquals(2, found.size)   // 청바지는 제외됨
-        assertEquals(listOf("흰 반팔티", "검정 셔츠"), found.map { it.name })
+        // 상품 목록에 보여줄 최저가
+        val lowestPrice = skus.minOf { it.price.amount }
+        assertEquals(19000, lowestPrice)
+    }
+
+    @Test
+    fun `Product에는 가격이 없다 - 가격은 SKU가 소유`() {
+        val product = Product(1L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
+
+        // product.price  ← 컴파일 안 됨
+        // "티셔츠 19000원"이 아니라 "검정 M 티셔츠 19000원"이 진짜 판매 단위
+        val sku = Sku(1L, product.id, "검정 / M", Money(19000))
+        assertEquals(Money(19000), sku.price)
+    }
+
+    // ===== Category =====
+
+    @Test
+    fun `카테고리는 계층 구조를 드러내지 않는다`() {
+        val category = Category(3L, "티셔츠")
+
+        // category.children  ← 없음
+        // category.parent    ← 없음
+        // 계층은 DB(클로저 테이블)에 있고, 리포지토리에게 물어본다
+        assertEquals("티셔츠", category.name)
+    }
+
+    // ===== 도메인 경계 확인 =====
+
+    @Test
+    fun `상품 상세 조합 - 카탈로그만으로 구성`() {
+        val product = Product(100L, "반팔 티셔츠", "면 100%", 3L, SaleStatus.SELLING)
+        val category = Category(3L, "티셔츠")
+        val skus = listOf(
+            Sku(1L, 100L, "검정 / M", Money(19000)),
+            Sku(2L, 100L, "검정 / L", Money(19000))
+        )
+
+        // 화면에 필요한 것: 상품명 + 카테고리 + 옵션 목록 + 최저가
+        assertEquals("반팔 티셔츠", product.name)
+        assertEquals("티셔츠", category.name)
+        assertEquals(listOf("검정 / M", "검정 / L"), skus.map { it.optionName })
+        assertEquals(19000, skus.minOf { it.price.amount })
+
+        // 재고("품절 여부")는 여기 없음 → 재고 포트로 별도 조회 후 상위에서 조합
     }
 }
