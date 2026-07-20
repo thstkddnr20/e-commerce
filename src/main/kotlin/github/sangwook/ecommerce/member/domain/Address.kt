@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("addresses")
 class Address(
+    id: Long? = null,
     memberId: Long,
     recipientName: String,
     recipientPhone: String,
@@ -15,7 +16,7 @@ class Address(
 ) {
     @Id
     @Column("id")
-    val id: Long = 0
+    private val id: Long? = id
 
     @Column("member_id")
     val memberId: Long = memberId
@@ -34,4 +35,10 @@ class Address(
 
     @Column("is_default")
     val isDefault: Boolean = isDefault
+
+    fun id(): Long {
+        return requireNotNull(id) {
+            "저장되지 않은 Address의 ID에는 접근할 수 없습니다."
+        }
+    }
 }

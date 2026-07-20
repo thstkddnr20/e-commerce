@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("product")
 class Product(
+    id : Long? = null,
     categoryId: Long,
     name: String,
     description: String,
@@ -14,7 +15,7 @@ class Product(
 
     @Id
     @Column("product_id")
-    val id: Long? = null
+    private val id: Long? = id
 
     @Column("category_id")
     val categoryId: Long = categoryId
@@ -30,4 +31,10 @@ class Product(
     @Column("status")
     var status: SaleStatus = status
         private set
+
+    fun id(): Long {
+        return requireNotNull(id) {
+            "저장되지 않은 Product의 ID에는 접근할 수 없습니다."
+        }
+    }
 }

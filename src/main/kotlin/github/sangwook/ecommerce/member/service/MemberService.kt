@@ -29,7 +29,7 @@ class MemberService(
         val member = memberRepository.findByEmail(email) ?: throw MemberNotFoundException()
         if (!passwordEncoder.matches(rawPassword, member.passwordHash))
             throw MemberNotFoundException()
-        return MemberSession(member.id, member.email, member.name)
+        return MemberSession(member.id(), member.email, member.name)
     }
 
 }

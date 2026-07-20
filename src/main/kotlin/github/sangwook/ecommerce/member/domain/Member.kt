@@ -6,13 +6,14 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table(name = "members")
 class Member(
+    id: Long? = null,
     email: String,
     passwordHash: String,
     name: String,
 ) {
     @Id
     @Column("id")
-    val id: Long = 0
+    private val id: Long? = id
 
     @Column("email")
     var email: String = email
@@ -26,4 +27,9 @@ class Member(
     var name: String = name
         private set
 
+    fun id(): Long {
+        return requireNotNull(id) {
+            "저장되지 않은 Member의 ID에는 접근할 수 없습니다."
+        }
+    }
 }
