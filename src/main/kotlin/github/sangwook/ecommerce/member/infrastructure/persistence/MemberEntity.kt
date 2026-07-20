@@ -1,25 +1,20 @@
 package github.sangwook.ecommerce.member.infrastructure.persistence
 
-import jakarta.persistence.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
 @Table(name = "members")
-class MemberEntity(email: String, passwordHash: String, name: String) {
-
+data class MemberEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
+    val id: Long = 0,
 
-    @Column(name = "email", unique = true, nullable = false)
-    var email: String = email
-        protected set
+    @Column("email")
+    var email: String,
 
-    @Column(name = "password_hash", nullable = false)
-    var passwordHash: String = passwordHash
-        protected set
+    @Column("password_hash")
+    var passwordHash: String,
 
-    @Column(name = "name", nullable = false)
-    var name: String = name
-        protected set
-
-}
+    @Column("name")
+    var name: String
+)

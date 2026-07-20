@@ -1,51 +1,27 @@
 package github.sangwook.ecommerce.member.infrastructure.persistence
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
-@Table(name = "addresses")
-class AddressEntity(
-    member: MemberEntity,
-    recipientName: String,
-    recipientPhone: String,
-    address: String,
-    deliveryRequest: String,
-    isDefault: Boolean
-) {
-
+@Table("addresses")
+data class AddressEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
+    val id: Long = 0,
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    val member: MemberEntity = member
+    val memberId: Long,
 
-    @Column(name = "recipient_name", nullable = false)
-    var recipientName: String = recipientName
-        protected set
+    @Column("recipient_name")
+    val recipientName: String,
 
-    @Column(name = "recipient_phone", nullable = false)
-    var recipientPhone: String = recipientPhone
-        protected set
+    @Column("recipient_phone")
+    val recipientPhone: String,
 
-    @Column(name = "address", nullable = false)
-    var address: String = address
-        protected set
+    val address: String,
 
-    @Column(name = "delivery_request", nullable = false)
-    var deliveryRequest: String = deliveryRequest
-        protected set
+    @Column("delivery_request")
+    val deliveryRequest: String,
 
-    @Column(name = "is_default", nullable = false)
-    var isDefault: Boolean = isDefault
-        protected set
-
-}
+    @Column("is_default")
+    val isDefault: Boolean
+)
