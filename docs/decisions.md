@@ -13,4 +13,11 @@
 - 도메인간의 협력이 필요한 부분에서 UseCase를 사용 (7/17)
   - 하나의 도메인만을 사용하는 부분에서는 Controller가 Service를 직접 참조한다.
   - 여러 도메인을 사용하는 부분에서는 Service의 상위 계층인 UseCase를 만들고 Service를 orchestrate 한다.
-  - UseCase에는 흐름을 직관적으로 유추할 수 있는 이름을 지어준다. ex) PlaceOrderUseCase 
+  - UseCase에는 흐름을 직관적으로 유추할 수 있는 이름을 지어준다. ex) PlaceOrderUseCase
+
+- JPA -> Spring Data JDBC 사용과 도메인과 엔티티 겸용 (7/20)
+  - JPA에서 Spring Data JDBC로 변경되면서 JPA 관련 어노테이션들이 없어졌다.
+  - 클래스가 완전히 순수해졌다고 할 순 없지만 JPA가 제공하는 강력한 기능의 제약조건에 비해서는 조금 더 제약에서 벗어났다고 할 수 있을것 같다.
+  - 또한 @MappedCollection을 이용하여 Order <-> OrderItem 처럼 Order에 종속적인 OrderItem의 관계를 Aggregate 단위로 나타낼 수 있다.
+    - 단점은 영속성 컨텍스트와 같은 개념이 없기 때문에 이전 상태를 모르므로 객체 변경시 aggregate 관련 튜플을 모두 삭제하고 다시 insert 한다는 점.
+  - 이 시점에서 Domain과 Entity를 겸용해서 사용한다면 어떨까?
