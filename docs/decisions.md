@@ -21,3 +21,40 @@
   - 또한 @MappedCollection을 이용하여 Order <-> OrderItem 처럼 Order에 종속적인 OrderItem의 관계를 Aggregate 단위로 나타낼 수 있다.
     - 단점은 영속성 컨텍스트와 같은 개념이 없기 때문에 이전 상태를 모르므로 객체 변경시 aggregate 관련 튜플을 모두 삭제하고 다시 insert 한다는 점.
   - 이 시점에서 Domain과 Entity를 겸용해서 사용한다면 어떨까?
+
+- 도메인, 엔티티 겸용에 따른 도메인 클래스 생성 규칙 (7/20)
+  ```kotlin
+  @Table(name = "product")
+  class Product(
+  categoryId: Long,
+  name: String,
+  description: String,
+  status: SaleStatus
+  ) {
+  
+    @Id
+    @Column("product_id")
+    val id: Long? = null
+
+    @Column("category_id")
+    val categoryId: Long = categoryId
+
+    @Column("name")
+    var name: String = name
+        private set
+
+    @Column("description")
+    var description: String = description
+        private set
+
+    @Column("status")
+    var status: SaleStatus = status
+        private set
+  }
+  ```
+  1. data class가 아닌 class를 사용한다. (var + private set 사용 위함)
+  2. 속성을 생성자에 선언하는 것이 아닌 클래스 내부에 선언한다.
+  3. 테이블은 @Table 어노테이션으로 이름을 지정한다.
+  4. 컬럼엔 모두 @Column 어노테이션으로 이름을 지정한다.
+  5. 변경할 수 없는 데이터는 val로 선언한다. (기본키, 참조키)
+  6. 변경할 수 있는 데이터는 var로 선언하고 private setter를 작성한다.
