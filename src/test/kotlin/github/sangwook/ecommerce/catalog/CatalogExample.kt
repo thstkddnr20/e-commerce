@@ -3,36 +3,15 @@ package github.sangwook.ecommerce.catalog
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-//============================================= Entity
-
-class ProductEntity(
-    val id: Long,
-    var name: String,
-    var description: String,
-    var category: Long,
-    var status: SaleStatus
-)
-
-class SkuEntity(
-    val id: Long,
-    val catalogId: Long,
-    var optionName: String,
-    var price: Int
-)
-
-class CategoryEntity(
-    val id: Long,
-    var name: String
-)
-
-class CategoryClosure(
-    val ancestor: Long,
-    val descendant: Long,
-    val depth: Int
-)
-
-
-//============================================= Entity End
+/**
+ * 규칙 1. 상품은 최소 하나의 SKU를 가진다.
+ * 규칙 2. SKU는 반드시 하나의 상품에 속한다.
+ * 규칙 3. 한 상품 안에서 SKU의 옵션 이름은 중복될 수 없다.
+ * 규칙 4. 상품도 SELLING 상태, SKU도 SELLING 상태여야 판매 가능하다.
+ * 규칙 5. 상품 판매 상태 변경은 SKU의 판매 상태를 건드리지 않는다.
+ * 규칙 6. 가격은 SKU가 소유한다.
+ * 규칙 7. SKU 단종 시 삭제하지 않고 판매 상태를 변경한다.
+ */
 //============================================= Domain
 
 class Category(
