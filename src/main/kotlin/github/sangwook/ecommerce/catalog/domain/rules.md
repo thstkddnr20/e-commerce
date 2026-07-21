@@ -1,6 +1,7 @@
 [Product 생명주기]
 1. 상품 최초 생성 시 DRAFT 상태가 된다.
-2. SKU가 최소 하나 있으면 SELLING으로 전환 가능하다.
+2. SELLING 상태인 SKU가 최소 하나 있어야 SELLING으로 전환 가능하다. (전환 후 모든 SKU가 STOPPED되어도 Product는 SELLING을 유지한다. 
+   이 경우 목록에 노출되지 않으므로 별도 처리하지 않는다.)
    2-1. SELLING <-> STOPPED 전환 가능, DRAFT로는 역행 불가.
    2-2. DRAFT 상품은 구매자에게 노출되지 않는다.
 
