@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository
 interface SkuRepository: CrudRepository<Sku, Long>{
     fun findByProductId(productId: Long): List<Sku>
 
-    fun existByProductIdAndOptionName(productId: Long, optionName: String): Boolean
+    fun existsByProductIdAndOptionName(productId: Long, optionName: String): Boolean
 
     fun countByProductIdAndStatus(productId: Long, status: SaleStatus): Int
 }
