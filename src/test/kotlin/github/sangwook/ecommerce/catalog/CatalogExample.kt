@@ -3,18 +3,6 @@ package github.sangwook.ecommerce.catalog
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-/**
- * 규칙 1. 상품은 최소 하나의 SKU를 가진다.
- * 규칙 2. SKU는 반드시 하나의 상품에 속한다.
- * 규칙 3. 한 상품 안에서 SKU의 옵션 이름은 중복될 수 없다.
- * 규칙 4. 상품도 SELLING 상태, SKU도 SELLING 상태여야 판매 가능하다.
- * 규칙 5. 상품 판매 상태 변경은 SKU의 판매 상태를 건드리지 않는다.
- * 규칙 6. 가격은 SKU가 소유한다.
- * 규칙 7. SKU 단종 시 삭제하지 않고 판매 상태를 변경한다.
- */
-
-//SKU가 반드시 하나의 상품에 속한다고 해서 Product의 상태를 알 필요는 없어보임 productId만 가지면 될 것
-//Product -> SKU는? - 규칙 1번, 규칙 4번에서 관련이 있지만 이는 Service 계층에서 충분히 검토할 수 있다고 판단
 //============================================= Domain
 
 class Category(
