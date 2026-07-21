@@ -14,7 +14,7 @@ class Product(
 ) {
 
     @Id
-    @Column("product_id")
+    @Column("id")
     private val id: Long? = id
 
     @Column("category_id")

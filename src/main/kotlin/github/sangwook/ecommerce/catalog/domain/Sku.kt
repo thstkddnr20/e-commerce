@@ -14,7 +14,7 @@ class Sku(
     status: SaleStatus,
 ) {
     @Id
-    @Column("sku_id")
+    @Column("id")
     private val id: Long? = id
 
     @Column("product_id")

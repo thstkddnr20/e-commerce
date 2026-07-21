@@ -11,7 +11,7 @@ class Category(
 ) {
 
     @Id
-    @Column("category_id")
+    @Column("id")
     private val id: Long? = id
 
     @Column("name")
