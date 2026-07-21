@@ -36,4 +36,11 @@ class Sku(
             "저장되지 않은 Sku의 ID에는 접근할 수 없습니다."
         }
     }
+
+    fun changeStatus(newStatus: SaleStatus) {
+        require(newStatus == SaleStatus.SELLING || newStatus == SaleStatus.STOPPED) {
+            "SKU는 판매중/중지만 가능합니다."
+        }
+        this.status = newStatus
+    }
 }

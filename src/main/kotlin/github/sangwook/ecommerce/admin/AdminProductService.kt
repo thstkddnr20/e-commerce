@@ -45,6 +45,13 @@ class AdminProductService(
         productRepository.save(product)
     }
 
+    @Transactional
+    fun changeSkuStatus(skuId: Long, status: SaleStatus) {
+        val sku = skuRepository.findByIdOrNull(skuId) ?: throw IllegalArgumentException("SKU를 찾을 수 없습니다.")
+        sku.changeStatus(status)
+        skuRepository.save(sku)
+    }
+
     private fun isLeaf(categoryId: Long): Boolean {
         return categoryRepository.countDescendants(categoryId) == 0
     }
