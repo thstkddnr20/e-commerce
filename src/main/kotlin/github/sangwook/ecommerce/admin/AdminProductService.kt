@@ -7,7 +7,6 @@ import github.sangwook.ecommerce.catalog.domain.Sku
 import github.sangwook.ecommerce.catalog.infrastructure.CategoryRepository
 import github.sangwook.ecommerce.catalog.infrastructure.ProductRepository
 import github.sangwook.ecommerce.catalog.infrastructure.SkuRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,7 +27,7 @@ class AdminProductService(
 
     @Transactional
     fun registerSku(productId: Long, optionName: String, price: Int) {
-        productRepository.findByIdOrNull(productId) ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
+        if (!productRepository.existsById(productId)) throw IllegalArgumentException("상품을 찾을 수 없습니다.")
         if (skuRepository.existByProductIdAndOptionName(productId, optionName)) throw IllegalArgumentException("이미 존재하는 옵션입니다.")
         val sku = Sku(productId = productId, optionName = optionName, price = Money(price), status = SaleStatus.SELLING)
         skuRepository.save(sku)
