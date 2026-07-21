@@ -7,6 +7,7 @@ import github.sangwook.ecommerce.catalog.domain.Sku
 import github.sangwook.ecommerce.catalog.infrastructure.CategoryRepository
 import github.sangwook.ecommerce.catalog.infrastructure.ProductRepository
 import github.sangwook.ecommerce.catalog.infrastructure.SkuRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -31,6 +32,17 @@ class AdminProductService(
         if (skuRepository.existByProductIdAndOptionName(productId, optionName)) throw IllegalArgumentException("이미 존재하는 옵션입니다.")
         val sku = Sku(productId = productId, optionName = optionName, price = Money(price), status = SaleStatus.SELLING)
         skuRepository.save(sku)
+    }
+
+    @Transactional
+    fun changeProductStatus(productId: Long, status: SaleStatus) {
+        val product = productRepository.findByIdOrNull(productId) ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
+        if (status == SaleStatus.SELLING) {
+            val sellingSkuCount = skuRepository.countByProductIdAndStatus(productId, SaleStatus.SELLING)
+            if (sellingSkuCount == 0) throw IllegalArgumentException("판매 가능한 SKU가 없습니다.")
+        }
+        product.changeStatus(status)
+        productRepository.save(product)
     }
 
     private fun isLeaf(categoryId: Long): Boolean {

@@ -37,4 +37,9 @@ class Product(
             "저장되지 않은 Product의 ID에는 접근할 수 없습니다."
         }
     }
+
+    fun changeStatus(newStatus: SaleStatus) {
+        require(newStatus != SaleStatus.DRAFT) { "DRAFT 상태로는 변경할 수 없습니다." }
+        this.status = newStatus
+    }
 }
