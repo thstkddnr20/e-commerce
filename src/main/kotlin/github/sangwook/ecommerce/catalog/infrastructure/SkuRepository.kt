@@ -1,0 +1,10 @@
+package github.sangwook.ecommerce.catalog.infrastructure
+
+import github.sangwook.ecommerce.catalog.domain.Sku
+import org.springframework.data.repository.CrudRepository
+
+interface SkuRepository: CrudRepository<Sku, Long>{
+    fun findByProductId(productId: Long): List<Sku>
+
+    fun existByProductIdAndOptionName(productId: Long, optionName: String): Boolean
+}
