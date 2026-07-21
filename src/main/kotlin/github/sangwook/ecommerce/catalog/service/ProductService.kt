@@ -1,5 +1,6 @@
 package github.sangwook.ecommerce.catalog.service
 
+import github.sangwook.ecommerce.catalog.api.CategoryResponse
 import github.sangwook.ecommerce.catalog.api.ProductDetailResponse
 import github.sangwook.ecommerce.catalog.api.ProductSummaryResponse
 import github.sangwook.ecommerce.catalog.api.SkuDetailResponse
@@ -35,5 +36,24 @@ class ProductService(
     @Transactional(readOnly = true)
     fun getProductList(categoryId: Long): List<ProductSummaryResponse> {
         return productRepository.findSellableSummaries(categoryId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getCategories(): List<CategoryResponse> {
+        val flats = categoryRepository.findAllCategoryFlats()
+        val nodeMap = flats.associate {
+            flat -> flat.id to CategoryResponse(id = flat.id, name = flat.name, children = mutableListOf())
+        }
+        val roots = mutableListOf<CategoryResponse>()
+        flats.forEach { flat ->
+            val node = nodeMap.getValue(flat.id)
+            if (flat.parentId == null) {
+                roots.add(node)
+            } else {
+                val parent = nodeMap.getValue(flat.parentId)
+                (parent.children as MutableList).add(node)
+            }
+        }
+        return roots
     }
 }

@@ -8,4 +8,7 @@ interface CategoryRepository: CrudRepository<Category, Long> {
 
     @Query("SELECT COUNT(*) FROM category_closure WHERE ancestor = :categoryId AND depth > 0")
     fun countDescendants(categoryId: Long): Int
+
+    @Query("SELECT c.id, c.name, cc.ancestor AS parent_id FROM category c LEFT JOIN category_closure cc ON c.id = cc.descendant AND cc.depth = 1")
+    fun findAllCategoryFlats(): List<CategoryFlat>
 }
